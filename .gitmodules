@@ -1,0 +1,3 @@
+[submodule "todo-list-frontend/todo-app"]
+	path = todo-list-frontend/todo-app
+	url = https://github.com/Jayrille/PIT3-React-Django.git
