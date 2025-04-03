@@ -12,65 +12,97 @@ export default function TodoList() {
 
     useEffect(() => {
         localStorage.setItem("darkMode", darkMode);
-        if (darkMode) {
-            document.body.style.backgroundColor = "#222";
-        } else {
-            document.body.style.backgroundColor = "#eae0c8";
-        }
+        document.body.style.backgroundColor = darkMode ? "#222" : "#eae0c8";
     }, [darkMode]);
 
-    const removeTask = (index) => {
-        setTasks(tasks.filter((_, i) => i !== index));
-    };
+    useEffect(() => {
+        const fetchTasks = async () => {
+            const response = await fetch("https://pit3-react-django.onrender.com/api/todos/fetch/");
+            const data = await response.json();
+            setTasks(data);
+        };
+        fetchTasks();
+    }, []);
 
-    const addTask = () => {
+    const addTask = async () => {
         if (task.trim() === "") return;
-        setTasks([...tasks, { text: task, completed: false }]);
+        const newTask = { title: task, completed: false };
+
+        const response = await fetch("https://pit3-react-django.onrender.com/api/todos/create/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newTask),
+        });
+        const data = await response.json();
+        setTasks([...tasks, data]);
         setTask("");
     };
 
-    const toggleComplete = (index) => {
-        const newTasks = tasks.map((t, i) => 
-            i === index ? { ...t, completed: !t.completed } : t
-        );
-        setTasks(newTasks);
+    const removeTask = async (taskId) => {
+        await fetch(`https://pit3-react-django.onrender.com/api/todos/${taskId}/delete/`, {
+            method: "DELETE",
+        });
+        setTasks(tasks.filter((task) => task.id !== taskId));
     };
 
-    const startEditing = (index) => {
+    const toggleComplete = async (taskId) => {
+        const task = tasks.find((task) => task.id === taskId);
+        const updatedTask = { ...task, completed: !task.completed };
+
+        const response = await fetch(`https://pit3-react-django.onrender.com/api/todos/${taskId}/update/`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedTask),
+        });
+        const data = await response.json();
+        setTasks(tasks.map((task) => (task.id === taskId ? data : task)));
+    };
+
+    const editTask = (index) => {
         setEditingIndex(index);
-        setEditedTask(tasks[index].text);
+        setEditedTask(tasks[index].title);
     };
 
-    const confirmEdit = (index) => {
-        const updatedTasks = tasks.map((t, i) =>
-            i === index ? { ...t, text: editedTask } : t
-        );
-        setTasks(updatedTasks);
+    const saveEditedTask = async (taskId) => {
+        if (editedTask.trim() === "") return;
+        const updatedTask = { title: editedTask, completed: false };
+
+        const response = await fetch(`https://pit3-react-django.onrender.com/api/todos${taskId}/update/`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedTask),
+        });
+        const data = await response.json();
+        setTasks(tasks.map((task) => (task.id === taskId ? data : task)));
         setEditingIndex(null);
     };
 
-    const filteredTasks = tasks.filter(task => {
+    const clearCompleted = async () => {
+        const completedTasks = tasks.filter((task) => task.completed);
+        for (const task of completedTasks) {
+            await removeTask(task.id);
+        }
+    };
+
+    const filteredTasks = tasks.filter((task) => {
         if (filter === "completed") return task.completed;
         if (filter === "pending") return !task.completed;
         return true;
     });
 
-    return(
+    return (
         <div className={`app-container ${darkMode ? "dark-mode" : "light-mode"}`}>
             <h2>To-Do List</h2>
-            <button 
-                className="theme-toggle"
-                onClick={() => setDarkMode(!darkMode)}
-            >
+            <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
                 {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
             </button>
 
             <div className="input-container">
                 <input
-                  type="text"
-                  placeholder="Add a new task..."
-                  value={task}
-                  onChange={(e) => setTask(e.target.value)}
+                    type="text"
+                    placeholder="Add a new task..."
+                    value={task}
+                    onChange={(e) => setTask(e.target.value)}
                 />
                 <button onClick={addTask}>Add Task</button>
             </div>
@@ -82,38 +114,27 @@ export default function TodoList() {
             </div>
 
             <ul>
-                {filteredTasks.map((t, index) => (
-                <li key={index} className={t.completed ? "completed" : ""}>
-                    <input 
-                        type="checkbox" 
-                        checked={t.completed} 
-                        onChange={() => toggleComplete(index)}
-                    />
-                    {editingIndex === index ? (
-                        <input 
-                            type="text" 
-                            value={editedTask} 
-                            onChange={(e) => setEditedTask(e.target.value)}
-                        />
-                    ) : (
-                        <span 
-                            onClick={() => toggleComplete(index)}
-                            style={{ textDecoration: t.completed ? 'line-through' : 'none', color: t.completed ? 'black' : 'inherit' }}
-                        >
-                            {t.text}
-                        </span>
-                    )}
-                    <div className="task-buttons">
-                        <button onClick={() => removeTask(index)}>Delete</button>
-                        {editingIndex === index ? (
-                            <button onClick={() => confirmEdit(index)}>💾</button>
+                {filteredTasks.map((t) => (
+                    <li key={t.id} className={t.completed ? "completed" : ""}>
+                        <input type="checkbox" checked={t.completed} onChange={() => toggleComplete(t.id)} />
+                        {editingIndex === t.id ? (
+                            <input type="text" value={editedTask} onChange={(e) => setEditedTask(e.target.value)} />
                         ) : (
-                            <button onClick={() => startEditing(index)}>Edit</button>
+                            <span onClick={() => toggleComplete(t.id)} style={{ textDecoration: t.completed ? 'line-through' : 'none' }}>
+                                {t.title}
+                            </span>
                         )}
-                    </div>
-                </li>
+                        <div className="task-buttons">
+                            <button onClick={() => removeTask(t.id)}>Delete</button>
+                            {editingIndex === t.id ? (
+                                <button onClick={() => saveEditedTask(t.id)}>💾</button>
+                            ) : (
+                                <button onClick={() => editTask(t.id)}>Edit</button>
+                            )}
+                        </div>
+                    </li>
                 ))}
             </ul>
         </div>
-    )
+    );
 }
