@@ -6,4 +6,3 @@ export default defineConfig({
   plugins: [react()],
   base: './',  // This line is important for Netlify
 });
-
