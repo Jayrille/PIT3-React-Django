@@ -29,6 +29,7 @@ ALLOWED_HOSTS = []
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -55,7 +56,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'myproject.urls'
-
 
 TEMPLATES = [
     {
@@ -116,7 +116,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-CORS_ALLOW_ALL_ORIGINS = True  # Allow all frontend requests (for dev)
+
 
 
 # Static files (CSS, JavaScript, Images)
