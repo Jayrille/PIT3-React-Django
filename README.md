@@ -6,10 +6,10 @@ https://pit3-react-django.onrender.com/api/todos/fetch
 https://pit3-react-django.onrender.com/api/todos/1/update
 https://pit3-react-django.onrender.com/api/todos/1/delete
 
-Live Deployed link Backend:
+Live Deployed link Backend(Render):
 https://pit3-react-django.onrender.com
 
-Live Deployed Link Frontend:
+Live Deployed Link Frontend(Netlify):
 https://todolist-pit3.netlify.app/
 
 
