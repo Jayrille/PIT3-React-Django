@@ -31,7 +31,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['pit3-react-django.onrender.com']
 
 CORS_ALLOWED_ORIGINS = [
-    'https://todolist-pit3.netlify.app/',
+    'https://todolist-pit3.netlify.app',
 ]
 
 # Application definition
