@@ -1,4 +1,13 @@
 <<<<<<< HEAD
+
+API ENDPOINTS:
+https://pit3-react-django.onrender.com/api/todos/create
+https://pit3-react-django.onrender.com/api/todos/fetch
+https://pit3-react-django.onrender.com/api/todos/1/update
+https://pit3-react-django.onrender.com/api/todos/1/delete
+
+
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
