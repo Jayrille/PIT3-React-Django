@@ -15,7 +15,7 @@ export default function TodoList() {
 
     useEffect(() => {
         // Fetch tasks from the Django API
-        axios.get(`${API_URL}fetch/`)  // Make sure this matches your Django URL
+        axios.get(`${API_URL}fetch`)  // Make sure this matches your Django URL
             .then(response => {
                 setTasks(response.data);  // Assuming response contains the tasks
             })
@@ -34,7 +34,7 @@ export default function TodoList() {
 
     const removeTask = (index) => {
         const taskToRemove = tasks[index];
-        axios.delete(`${API_URL}${taskToRemove.id}/delete/`)
+        axios.delete(`${API_URL}${taskToRemove.id}/delete`)
             .then(() => {
                 setTasks(tasks.filter((_, i) => i !== index));
             })
@@ -45,7 +45,7 @@ export default function TodoList() {
 
     const addTask = () => {
         if (task.trim() === "") return;
-        axios.post(`${API_URL}create/`, { text: task, completed: false })
+        axios.post(`${API_URL}create`, { text: task, completed: false })
             .then(response => {
                 setTasks([...tasks, response.data]);  // Assuming the API responds with the newly created task
                 setTask("");
@@ -57,7 +57,7 @@ export default function TodoList() {
 
     const toggleComplete = (index) => {
         const updatedTask = { ...tasks[index], completed: !tasks[index].completed };
-        axios.put(`${API_URL}${tasks[index].id}/update/`, updatedTask)
+        axios.put(`${API_URL}${tasks[index].id}/update`, updatedTask)
             .then(response => {
                 const updatedTasks = tasks.map((task, i) =>
                     i === index ? response.data : task
@@ -76,7 +76,7 @@ export default function TodoList() {
 
     const confirmEdit = (index) => {
         const updatedTask = { ...tasks[index], text: editedTask };
-        axios.put(`${API_URL}${tasks[index].id}/update/`, updatedTask)
+        axios.put(`${API_URL}${tasks[index].id}/update`, updatedTask)
             .then(response => {
                 const updatedTasks = tasks.map((task, i) =>
                     i === index ? response.data : task
