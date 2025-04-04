@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from 'axios';  // Make sure axios is installed
+import axios from 'axios'; 
 
 const API_URL = "https://pit3-react-django.onrender.com/api/todos/";
 
