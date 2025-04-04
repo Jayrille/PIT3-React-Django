@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import axios from 'axios';  // Make sure axios is installed
+
+const API_URL = "https://pit3-react-django.onrender.com/api/todos/";
 
 export default function TodoList() {
     const [tasks, setTasks] = useState([]);
@@ -11,6 +14,16 @@ export default function TodoList() {
     });
 
     useEffect(() => {
+        // Fetch tasks from the Django API
+        axios.get(`${API_URL}fetch/`)  // Make sure this matches your Django URL
+            .then(response => {
+                setTasks(response.data);  // Assuming response contains the tasks
+            })
+            .catch(error => {
+                console.error("Error fetching tasks:", error);
+            });
+
+        // Handle dark mode change
         localStorage.setItem("darkMode", darkMode);
         if (darkMode) {
             document.body.style.backgroundColor = "#222";
@@ -20,20 +33,40 @@ export default function TodoList() {
     }, [darkMode]);
 
     const removeTask = (index) => {
-        setTasks(tasks.filter((_, i) => i !== index));
+        const taskToRemove = tasks[index];
+        axios.delete(`${API_URL}${taskToRemove.id}/delete/`)
+            .then(() => {
+                setTasks(tasks.filter((_, i) => i !== index));
+            })
+            .catch(error => {
+                console.error("Error deleting task:", error);
+            });
     };
 
     const addTask = () => {
         if (task.trim() === "") return;
-        setTasks([...tasks, { text: task, completed: false }]);
-        setTask("");
+        axios.post(`${API_URL}create/`, { text: task, completed: false })
+            .then(response => {
+                setTasks([...tasks, response.data]);  // Assuming the API responds with the newly created task
+                setTask("");
+            })
+            .catch(error => {
+                console.error("Error adding task:", error);
+            });
     };
 
     const toggleComplete = (index) => {
-        const newTasks = tasks.map((t, i) => 
-            i === index ? { ...t, completed: !t.completed } : t
-        );
-        setTasks(newTasks);
+        const updatedTask = { ...tasks[index], completed: !tasks[index].completed };
+        axios.put(`${API_URL}${tasks[index].id}/update/`, updatedTask)
+            .then(response => {
+                const updatedTasks = tasks.map((task, i) =>
+                    i === index ? response.data : task
+                );
+                setTasks(updatedTasks);
+            })
+            .catch(error => {
+                console.error("Error updating task:", error);
+            });
     };
 
     const startEditing = (index) => {
@@ -42,11 +75,18 @@ export default function TodoList() {
     };
 
     const confirmEdit = (index) => {
-        const updatedTasks = tasks.map((t, i) =>
-            i === index ? { ...t, text: editedTask } : t
-        );
-        setTasks(updatedTasks);
-        setEditingIndex(null);
+        const updatedTask = { ...tasks[index], text: editedTask };
+        axios.put(`${API_URL}${tasks[index].id}/update/`, updatedTask)
+            .then(response => {
+                const updatedTasks = tasks.map((task, i) =>
+                    i === index ? response.data : task
+                );
+                setTasks(updatedTasks);
+                setEditingIndex(null);
+            })
+            .catch(error => {
+                console.error("Error updating task:", error);
+            });
     };
 
     const filteredTasks = tasks.filter(task => {
@@ -55,7 +95,7 @@ export default function TodoList() {
         return true;
     });
 
-    return(
+    return (
         <div className={`app-container ${darkMode ? "dark-mode" : "light-mode"}`}>
             <h2>To-Do List</h2>
             <button 
@@ -115,5 +155,5 @@ export default function TodoList() {
                 ))}
             </ul>
         </div>
-    )
+    );
 }
