@@ -6,6 +6,11 @@ https://pit3-react-django.onrender.com/api/todos/fetch
 https://pit3-react-django.onrender.com/api/todos/1/update
 https://pit3-react-django.onrender.com/api/todos/1/delete
 
+Live Deployed link Backend:
+https://pit3-react-django.onrender.com
+
+Live Deployed Link Frontend:
+https://todolist-pit3.netlify.app/
 
 
 # React + Vite
