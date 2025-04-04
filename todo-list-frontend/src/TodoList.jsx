@@ -17,6 +17,7 @@ export default function TodoList() {
         // Fetch tasks from the Django API
         axios.get(`${API_URL}fetch`)  // Make sure this matches your Django URL
             .then(response => {
+                console.log(response.data);  // Log the fetched tasks
                 setTasks(response.data);  // Assuming response contains the tasks
             })
             .catch(error => {
@@ -123,35 +124,35 @@ export default function TodoList() {
 
             <ul>
                 {filteredTasks.map((t, index) => (
-                <li key={index} className={t.completed ? "completed" : ""}>
-                    <input 
-                        type="checkbox" 
-                        checked={t.completed} 
-                        onChange={() => toggleComplete(index)}
-                    />
-                    {editingIndex === index ? (
+                    <li key={index} className={t.completed ? "completed" : ""}>
                         <input 
-                            type="text" 
-                            value={editedTask} 
-                            onChange={(e) => setEditedTask(e.target.value)}
+                            type="checkbox" 
+                            checked={t.completed} 
+                            onChange={() => toggleComplete(index)}
                         />
-                    ) : (
-                        <span 
-                            onClick={() => toggleComplete(index)}
-                            style={{ textDecoration: t.completed ? 'line-through' : 'none', color: t.completed ? 'black' : 'inherit' }}
-                        >
-                            {t.text}
-                        </span>
-                    )}
-                    <div className="task-buttons">
-                        <button onClick={() => removeTask(index)}>Delete</button>
                         {editingIndex === index ? (
-                            <button onClick={() => confirmEdit(index)}>💾</button>
+                            <input 
+                                type="text" 
+                                value={editedTask} 
+                                onChange={(e) => setEditedTask(e.target.value)}
+                            />
                         ) : (
-                            <button onClick={() => startEditing(index)}>Edit</button>
+                            <span 
+                                onClick={() => toggleComplete(index)}
+                                style={{ textDecoration: t.completed ? 'line-through' : 'none', color: t.completed ? 'black' : 'inherit' }}
+                            >
+                                {t.text ? t.text : "No Title"}  {/* Fallback text if `text` is empty */}
+                            </span>
                         )}
-                    </div>
-                </li>
+                        <div className="task-buttons">
+                            <button onClick={() => removeTask(index)}>Delete</button>
+                            {editingIndex === index ? (
+                                <button onClick={() => confirmEdit(index)}>💾</button>
+                            ) : (
+                                <button onClick={() => startEditing(index)}>Edit</button>
+                            )}
+                        </div>
+                    </li>
                 ))}
             </ul>
         </div>
