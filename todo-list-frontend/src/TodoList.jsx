@@ -46,7 +46,7 @@ export default function TodoList() {
 
     const addTask = () => {
         if (task.trim() === "") return;
-        axios.post(`${API_URL}create`, { text: task, completed: false })
+        axios.post(`${API_URL}create`, { title: task, completed: false })
             .then(response => {
                 setTasks([...tasks, response.data]);  // Assuming the API responds with the newly created task
                 setTask("");
@@ -72,11 +72,11 @@ export default function TodoList() {
 
     const startEditing = (index) => {
         setEditingIndex(index);
-        setEditedTask(tasks[index].text);
+        setEditedTask(tasks[index].title);
     };
 
     const confirmEdit = (index) => {
-        const updatedTask = { ...tasks[index], text: editedTask };
+        const updatedTask = { ...tasks[index], title: editedTask };
         axios.put(`${API_URL}${tasks[index].id}/update`, updatedTask)
             .then(response => {
                 const updatedTasks = tasks.map((task, i) =>
@@ -141,7 +141,7 @@ export default function TodoList() {
                                 onClick={() => toggleComplete(index)}
                                 style={{ textDecoration: t.completed ? 'line-through' : 'none', color: t.completed ? 'black' : 'inherit' }}
                             >
-                                {t.text ? t.text : "No Title"}  {/* Fallback text if `text` is empty */}
+                                {t.title ? t.title : "No Title"}  {/* Updated from t.text to t.title */}
                             </span>
                         )}
                         <div className="task-buttons">
