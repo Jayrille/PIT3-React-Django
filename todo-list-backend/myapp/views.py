@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import TodoItem
 from .serializers import TodoItemSerializer
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 # View to fetch all To-Do items
 class TodoListView(APIView):
@@ -77,8 +79,7 @@ class TodoDeleteView(APIView):
         todo.delete()  # Delete To-Do item
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+
 class MyProtectedView(APIView):
     permission_classes = [IsAuthenticated]
 
